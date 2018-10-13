@@ -1,1 +1,1 @@
-"web: igc" 
+"web: main" 
