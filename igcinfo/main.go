@@ -15,6 +15,6 @@ func main() {
 	http.HandleFunc("/igcinfo/api", handlerAPI)
 	http.HandleFunc("/igcinfo/api/igc", handlerAPIIGC)
 	http.HandleFunc("/igcinfo/api/igc/", handlerAPIIGCMORE)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("https://igc-ts.herokuapp.com/", nil)
 
 }
