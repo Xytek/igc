@@ -1,6 +1,6 @@
 module github.com/Xytek/igc
 
-import (
+require (
 github.com/marni/goigc
 github.com/golang/geo
 )
