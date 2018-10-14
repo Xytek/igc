@@ -1,0 +1,10 @@
+To get information with this service you must first POST a valid URL to https://igc-ts.herokuapp.com/igcinfo/api/igc. 
+You can find these URLs here: http://www.skypolaris.org/igc-files/
+
+The available pages are
+https://igc-ts.herokuapp.com/igcinfo/api
+https://igc-ts.herokuapp.com/igcinfo/api/igc/
+https://igc-ts.herokuapp.com/igcinfo/api/igc/<id> (In the format of ID0, ID1, ID2
+https://igc-ts.herokuapp.com/igcinfo/api/igc/<id>/<field> (Such as pilot, glider, glider_id)
+
+Application made by Morten Tingstad Spjøtvoll in relation to assignment 1 of IMT2681 - Cloud Technologies 2018
