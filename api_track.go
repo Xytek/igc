@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
-	igc "github.com/marni/goigc"
+	"github.com/marni/goigc"
 )
 
 var db TrackDB
 
 // handlerAPI writes out meta data
 func handlerAPI(w http.ResponseWriter, r *http.Request) {
-	http.Header.Set(w.Header(), "content.type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	// Using a function from stackoverflow I get the difference between two dates and format them according to ISO8601
 	y, mo, d, h, m, s := diff(startTime, time.Now())
 	uptime := fmt.Sprintf("P%vY%vM%vDT%vH%vM%vS", y, mo, d, h, m, s)
@@ -24,16 +24,15 @@ func handlerAPI(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(meta)
 }
 
+// handlerAPIIGC deals with POSTing URL, creating new Tracks/IDs and giving appropiate response on both POST and GET
 func handlerAPIIGC(w http.ResponseWriter, r *http.Request) {
-	http.Header.Set(w.Header(), "content.type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "POST":
-		// Checks that there is a body
 		if r.Body == nil {
 			http.Error(w, "Track POST request must have JSON body", http.StatusBadRequest)
 			return
 		}
-
 		// Reads in the URL
 		var u URL
 		err := json.NewDecoder(r.Body).Decode(&u)
@@ -41,7 +40,7 @@ func handlerAPIIGC(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		// checkURL is in url.go and uses regex to check if correct format
+		// checkURL uses regex to check if correct format
 		if checkURL(u.URL) == false {
 			http.Error(w, "The URL is formated incorrectly", http.StatusBadRequest)
 			return
@@ -52,7 +51,7 @@ func handlerAPIIGC(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		// Calculates the total distance between the first and last point
+		// Calculates the total distance between the first and last point, going through each point
 		totalDistance := 0.0
 		for i := 0; i < len(track.Points)-1; i++ {
 			totalDistance += track.Points[i].Distance(track.Points[i+1])
@@ -65,14 +64,16 @@ func handlerAPIIGC(w http.ResponseWriter, r *http.Request) {
 			track.GliderType,
 			track.GliderID,
 			totalDistance}
-		lastUsed++
+		lastUsed++ // Increments the global variable to keep IDs unique
 
-		// Initiates the db if it hasn't already
+		// Initiates the db if it hasn't been already
 		if db.tracks == nil {
 			db.Init()
 		}
 		// Adds the newly created Track and ID to the db
 		db.Add(t, i)
+		// Obligatory response
+		json.NewEncoder(w).Encode(i)
 		return
 	case "GET":
 		// To avoid a null value and ensure we get an empty array instead
@@ -103,7 +104,7 @@ func handlerAPIIGCMORE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Brings out the Track from the db
+	// Brings out the Track with said ID from the db
 	t, ok := db.Get(strings.ToUpper(parts[4]))
 	// Just a last check, but this really should never happen at this point
 	if !ok {
@@ -111,12 +112,12 @@ func handlerAPIIGCMORE(w http.ResponseWriter, r *http.Request) {
 	}
 	// It's already checked if the id is good, so now it makes sure there's an appropiate amount of parts
 	if len(parts) == 5 {
-		http.Header.Set(w.Header(), "content.type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(t)
 	}
 
 	// Here's all the logic for the <id>/<field> part.
-	// It has a case for each of the possibilities from the task, anything else will go to the default BadRequest
+	// It has a case for each of the possibilities from the task, anything else will go 404
 	if len(parts) == 6 {
 		switch strings.ToUpper(parts[5]) {
 		case "PILOT":
@@ -135,7 +136,7 @@ func handlerAPIIGCMORE(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	// In case the user tries any more / after <field>
+	// Bonus message in case the user tries any more / after <field>
 	if len(parts) > 6 {
 		http.Error(w, "Malformed url. You have one or more / too much.", http.StatusNotFound)
 	}
@@ -143,7 +144,7 @@ func handlerAPIIGCMORE(w http.ResponseWriter, r *http.Request) {
 
 // checkURL uses a regular expression to check that the URL is of the type that this program can read.
 func checkURL(u string) bool {
-	// There are two types of files that can be read. Only difference is one uses %20to%20 and other uses %20 between the cities.
+	// There are two types of files that can be read. Only difference is one uses %20to%20 and other uses %20 between the cities. Therefore the rest is hardcoded
 	check, _ := regexp.MatchString("^(http://skypolaris.org/wp-content/uploads/IGS%20Files/)(.*?)(%20)(.*?)(.igc)$", u)
 	if check == true {
 		return true

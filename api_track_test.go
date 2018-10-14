@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	igc "github.com/marni/goigc"
 )
@@ -20,8 +22,9 @@ Test overview:
 5. Get specific track by ID
 6. Get specific pilot by ID
 7. POST with both good and bad URL
-8. Get meta data
-9. checkURL with good and bad values
+8. POST checking response and adding of new track and id
+9. Get meta data
+10. checkURL with good and bad values
 */
 
 func Test_handlerAPIIGC_notImplemented(t *testing.T) {
@@ -217,10 +220,36 @@ func Test_handler_POST(t *testing.T) {
 	}
 }
 
+func Test_handler_POST_ResponseAndGet(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(handlerAPIIGC))
+	defer ts.Close()
+	db = TrackDB{}
+	db.Init()
+
+	// Test proper body
+	test := "{\"url\":\"http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc\"}"
+	track, _ := igc.ParseLocation("http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc")
+	resp, _ := http.Post(ts.URL+"/igcinfo/api/igc", "application/json", strings.NewReader(test))
+	var a ID
+	err := json.NewDecoder(resp.Body).Decode(&a)
+	if err != nil {
+		t.Errorf("Error parsing the expected JSON body. Got %s", err)
+	}
+	tr, erro := db.Get(a.ID)
+	if !erro {
+		t.Errorf("The track was not added properly, it could not be found on %s", a.ID)
+	}
+	if tr.HDate != track.Date || tr.Pilot != track.Pilot || tr.Glider != track.GliderType || tr.GliderID != track.GliderID {
+		t.Error("The track was not added properly. Its data is incorrect")
+	}
+}
+
 func Test_handlerAPI_GETMeta(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(handlerAPI))
 	defer ts.Close()
-	meta := Meta{"P0Y0M0DT0H0M0S", "Service for IGC tracks.", "v1"}
+	y, mo, d, h, m, s := diff(startTime, time.Now())
+	uptime := fmt.Sprintf("P%vY%vM%vDT%vH%vM%vS", y, mo, d, h, m, s)
+	meta := Meta{uptime, "Service for IGC tracks.", "v1"}
 	resp, err := http.Get(ts.URL + "/igcinfo/api")
 	if err != nil {
 		t.Errorf("Error making the GET request, %s", err)

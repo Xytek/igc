@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-var lastUsed int
-var startTime = time.Now()
+var lastUsed int           // Used and incremented when creating a new ID. Keeps them unique by always adding a +1 on last
+var startTime = time.Now() // Used for calculating the applications uptime
 
 func determineListenAddress() (string, error) {
 	port := os.Getenv("PORT")
