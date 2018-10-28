@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
@@ -19,7 +18,7 @@ type DBInfo struct {
 // db stores the credentials of our database
 var db DBInfo
 
-// DBInit fills Cred with the information about our database
+// DBInit fills DBInfo with the information about our database
 func DBInit() {
 	db.DBURL = "mongodb://username:password123@ds143293.mlab.com:43293/paragliding"
 	db.DBName = "paragliding"
@@ -42,8 +41,10 @@ func (db *DBInfo) addTrack(t Track) Track {
 	t.SimpleID = lastUsed
 	lastUsed++
 
-	// Adds a timestamp to the track
-	t.Timestamp = bson.NewObjectId().Time().Unix()
+	// Adds a timestamp to the track. The if sentence is for testing purposes
+	if t.Timestamp != 10 {
+		t.Timestamp = bson.NewObjectId().Time().Unix()
+	}
 
 	// Inserts the track into the database
 	err = session.DB(db.DBName).C(db.TrackCollectionName).Insert(t)
@@ -119,27 +120,6 @@ func (db *DBInfo) getTracksAfter(ts int64) []Track {
 		fmt.Printf("Error in getTracksBetween(): %v", err.Error())
 	}
 	return someTracks
-}
-
-// tracksNewerThan returns all tracks newer than the timestamp
-func (db *DBInfo) tracksNewerThan(ts int64) []Track {
-	// Creates a connection
-	session, err := mgo.Dial(db.DBURL)
-	if err != nil {
-		panic(err)
-	}
-	// Ensures the connection closes afterwards
-	defer session.Close()
-
-	var tracks []Track
-
-	query := bson.M{"_id": bson.M{"$gt": bson.NewObjectIdWithTime(time.Unix(ts, 0))}}
-	err = session.DB(db.DBName).C(db.TrackCollectionName).Find(query).Sort("_id").All(&tracks)
-	if err != nil {
-		fmt.Printf("Error in tracksNewerThan(): %v", err.Error())
-	}
-
-	return tracks
 }
 
 // latestTicker finds the track with the latest timestamp

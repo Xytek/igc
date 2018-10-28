@@ -91,7 +91,7 @@ func CheckUsers() {
 	var whMsg WebhookMsg
 	// Cycle through all tracks and fetch tracks with timestamp newer than the webhooks (edigble tracks)
 	for _, u := range webhooks {
-		tracks := db.tracksNewerThan(u.LastCheck)
+		tracks := db.getTracksAfter(u.LastCheck)
 		for _, t := range tracks {
 			whMsg.Tracks = append(whMsg.Tracks, t.SimpleID)
 		}
