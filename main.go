@@ -1,17 +1,30 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
+
+func determineListenAddress() (string, error) {
+	port := os.Getenv("PORT")
+	if port == "" {
+		return "", fmt.Errorf("$PORT not set")
+	}
+	return ":" + port, nil
+}
 
 func main() {
 	DBInit()
 	IDsInit()
 	r := mux.NewRouter()
-
+	addr, err := determineListenAddress()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Part 1, meta logic
 	r.HandleFunc("/paragliding/", apiRedirect)
 	r.HandleFunc("/paragliding/api", apiGet).Methods("GET")
@@ -37,5 +50,6 @@ func main() {
 	r.HandleFunc("/paragliding/admin/api/tracks", adminDelete).Methods("DELETE")
 
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(addr, r))
+	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
