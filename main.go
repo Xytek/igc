@@ -41,7 +41,7 @@ func main() {
 	r.HandleFunc("/paragliding/api/ticker/{timestamp}", tickerTimestampGet).Methods("GET")
 
 	// Part 4, webhook logic
-	r.HandleFunc("/paragliding/api/webhook/new_track", webhookNewTrackGet).Methods("POST")
+	r.HandleFunc("/paragliding/api/webhook/new_track", webhookNewTrackPost).Methods("POST")
 	r.HandleFunc("/paragliding/api/webhook/new_track/{webhook_id}", webhookNewTrackIDGet).Methods("GET")
 	r.HandleFunc("/paragliding/api/webhook/new_track/{webhook_id}", webhookNewTrackIDDelete).Methods("DELETE")
 

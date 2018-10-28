@@ -40,7 +40,7 @@ func tickerGet(w http.ResponseWriter, r *http.Request) {
 	var tracks = db.getAllTracks()
 
 	// Keeps the amount of tracks
-	var trackCount = len(tracks) - 1
+	var trackCount = len(tracks)
 	if trackCount < 0 {
 		http.Error(w, "No tracks have been added yet", http.StatusBadRequest)
 		return
@@ -56,7 +56,7 @@ func tickerGet(w http.ResponseWriter, r *http.Request) {
 
 	// Fill start/latest with the first/last timestamp respectively
 	ticker.Start = tracks[0].Timestamp
-	ticker.Latest = tracks[trackCount].Timestamp
+	ticker.Latest = tracks[trackCount-1].Timestamp
 
 	// Fills the pager with an appropiate amount of track IDs
 	for i := 0; i < limit; i++ {

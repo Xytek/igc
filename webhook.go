@@ -29,7 +29,7 @@ type WebhookMsg struct {
 }
 
 // webhookNewTrackGet
-func webhookNewTrackGet(w http.ResponseWriter, r *http.Request) {
+func webhookNewTrackPost(w http.ResponseWriter, r *http.Request) {
 	// Stores the user data that we're decoding
 	var user Webhook
 

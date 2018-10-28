@@ -26,6 +26,14 @@ func DBInit() {
 	db.WebhookCollectionName = "webhook"
 }
 
+// DBInitTest fills DBInfo for test purposes
+func DBInitTest() {
+	db.DBURL = "mongodb://username:password123@ds143893.mlab.com:43893/paragliding_test"
+	db.DBName = "paragliding_test"
+	db.TrackCollectionName = "track"
+	db.WebhookCollectionName = "webhook"
+}
+
 // AddTrack adds new tracks to the storage
 func (db *DBInfo) addTrack(t Track) Track {
 	// Creates a connection

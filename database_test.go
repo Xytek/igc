@@ -6,14 +6,6 @@ import (
 	igc "github.com/marni/goigc"
 )
 
-// DBInit_test fills DBInfo for test purposes
-func DBInitTest() {
-	db.DBURL = "mongodb://username:password123@ds143893.mlab.com:43893/paragliding_test"
-	db.DBName = "paragliding_test"
-	db.TrackCollectionName = "track"
-	db.WebhookCollectionName = "webhook"
-}
-
 /*
 The following function tests all of these functions that does something with track items in the database
 addTrack
@@ -28,8 +20,9 @@ deleteAllTracks
 func Test_TrackDatabase(t *testing.T) {
 	// Make sure the test runs the test database
 	DBInitTest()
-	// Make sure IDs don't carry data from other tests
+	// Make sure IDs and db don't carry data from other tests
 	IDs = nil
+	db.deleteAllTracks()
 	// Check that we can get data from URL
 	url := "http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc"
 	track, _ := igc.ParseLocation(url)
