@@ -5,4 +5,8 @@
 
 ---
 
-Due to issues setting up a working virtual machine on openstack I don't have a running clock function. I do however have the function in its own folder, unused. 
+This let's you get various information about igc files, post new ones, delete them and add your webhook to subscribe to new track additions.
+
+Changelog:
+
+30/10/2018: Found the issue with the virtual machine, so have now deployed the clock function there. 
