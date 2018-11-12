@@ -6,6 +6,7 @@
 ---
 
 Heroku: https://igcinf.herokuapp.com/paragliding/api
+
 Discord (that clock is tied to): https://discord.gg/ER6JEMH
 
 ---
