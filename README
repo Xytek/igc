@@ -7,4 +7,4 @@ https://igc-ts.herokuapp.com/igcinfo/api/igc/
 https://igc-ts.herokuapp.com/igcinfo/api/igc/<id> (In the format of ID0, ID1, ID2
 https://igc-ts.herokuapp.com/igcinfo/api/igc/<id>/<field> (Such as pilot, glider, glider_id)
 
-Application made by mortespj in relation to assignment 1 of IMT2681 - Cloud Technologies 2018
+Application made by spjmo in relation to assignment 1 of IMT2681 - Cloud Technologies 2018
